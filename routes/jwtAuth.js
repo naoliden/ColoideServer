@@ -15,7 +15,7 @@ router.post("/register", async (request, response) => {
     ])
 
     if(user.rows.length !== 0) {
-      // user exists. 401 -> unauthenticated
+      // user exists. 401 -> Unauthenticated. 403 -> Unauthorized
       return response.status(401).send("User already exists");
     }
 
