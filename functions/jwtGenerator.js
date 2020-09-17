@@ -6,7 +6,8 @@ function jwtGenerator(user_id){
     user: user_id,
   }
 
-  return jwt.sign(payload, process.env.jwtSecret, {expiresIn: 60*60*24*7})
+  // expiresIn is measured in seconds. I set it to five days.
+  return jwt.sign(payload, process.env.jwtSecret, { expiresIn: 60*60*24*5 })
 
 }
 
