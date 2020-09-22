@@ -21,6 +21,9 @@ app.use("/auth", require('./routes/jwtAuth'));
 // dashboard
 app.use("/dashboard", require('./routes/dashboard'));
 
+// clients
+app.use("/clients", require('./routes/clients'));
+
 app.listen(PORT, HOSTNAME, () => {
   console.log(`Server is running on port ${PORT}`)
 });
