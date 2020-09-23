@@ -4,6 +4,18 @@ const clientValidations = require('../middleware/clientValidations');
 const authorization = require('../middleware/authorization');
 
 
+router.get("/", async (req, res) => {
+  try {
+    const clients = await pool.query("SELECT * FROM clients;");
+    if (clients.rows.length > 0){
+      return res.json(clients.rows);
+    }
+  } catch(err) {
+    return res.status(500).send("Server Error");
+  }
+})
+
+
 // DONE REGISTER CLIENT
 router.post("/register", clientValidations, async (req, res) => {
   try {

@@ -24,6 +24,10 @@ app.use("/dashboard", require('./routes/dashboard'));
 // clients
 app.use("/clients", require('./routes/clients'));
 
+// users
+app.use("/users", require('./routes/users'));
+
+
 app.listen(PORT, HOSTNAME, () => {
   console.log(`Server is running on port ${PORT}`)
 });
