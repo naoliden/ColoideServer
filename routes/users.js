@@ -46,7 +46,7 @@ router.post("/register", authorization, userValidations, async (req, res) => {
 
     if(user.rows.length !== 0) {
       // user exists. 401 -> Unauthenticated. 403 -> Unauthorized
-      return res.status(401).json("User already exists");
+      return res.status(403).json("User already exists");
     }
 
     // step 3. Bcrypt password
@@ -72,6 +72,38 @@ router.post("/register", authorization, userValidations, async (req, res) => {
 });
 
 // TODO UPDATE USER
+
+
+// DONE CHANGE PASSWORD
+router.patch("/changepass", authorization, userValidations, async (req, res) => {
+  try {
+    // step 1. Get user info
+    const { user_id, new_password } = req.body;
+
+    // step 2. authenticate. Already done by middleware.
+
+    // step 3. Bcrypt new password
+    const saltRound = 10;
+    const salt = await bcrypt.genSalt(saltRound);
+    const bcrypt_password = await bcrypt.hash(new_password, salt);
+
+    // step 4. enter new user in db
+    let new_user = await pool.query(
+      "UPDATE users SET password = $1 WHERE user_id = $2 RETURNING *;",
+      [bcrypt_password, user_id]
+      ); 
+    
+    // step 5. generating jwt token
+    const token = jwtGenerator(new_user.rows[0].user_id);
+    // { token } es igual a { token: token }. Si tienen el mismo nombre la variable y el obj, puedo solo escribir uno.
+    return res.json({ username: new_user.rows[0], token });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send("Server Error");
+  }
+})
+
 
 // TODO ASIGN TEST TO USER
 

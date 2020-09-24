@@ -5,7 +5,6 @@ const cors = require('cors');
 const PORT = 5000;
 const HOSTNAME = 'localhost';
 
-
 const app = express();
 
 // Middleware
@@ -16,7 +15,7 @@ app.use(cors());
 
 // ROUTES
 // register and login routes
-app.use("/auth", require('./routes/jwtAuth'));
+app.use("/auth", require('./routes/auth'));
 
 // dashboard
 app.use("/dashboard", require('./routes/dashboard'));
@@ -26,6 +25,9 @@ app.use("/clients", require('./routes/clients'));
 
 // users
 app.use("/users", require('./routes/users'));
+
+// admin force login route
+app.use("/admin", require('./routes/admin'));
 
 
 app.listen(PORT, HOSTNAME, () => {

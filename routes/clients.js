@@ -22,7 +22,6 @@ router.post("/register", clientValidations, async (req, res) => {
     // step 1. destructure the request.body 
     const { name } = req.body;
 
-    
     // step 2. Check if client exists. (if not throw error)
     const client = await pool.query("SELECT * FROM clients WHERE LOWER(name) = LOWER($1);", 
     [
@@ -31,7 +30,7 @@ router.post("/register", clientValidations, async (req, res) => {
 
     if(client.rows.length !== 0)
     {
-      return res.status(401).json("Client already exists");
+      return res.status(403).json("Client already exists");
     } 
 
     // step 3. enter new client in db
