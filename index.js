@@ -29,6 +29,9 @@ app.use("/users", require('./routes/users'));
 // admin force login route
 app.use("/admin", require('./routes/admin'));
 
+// assets route
+app.use("/assets", require('./routes/assets'));
+
 
 app.listen(PORT, HOSTNAME, () => {
   console.log(`Server is running on port ${PORT}`)

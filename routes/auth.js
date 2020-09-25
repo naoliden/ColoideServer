@@ -83,10 +83,11 @@ router.post("/login", userValidations, async (req, res) => {
 });
 
 // DONE is-verified? route
-router.get("/is-verified", authorization, async (req, res) => {
+router.get("/verify", authorization, async (req, res) => {
   try {
     // Si authorization falla, entonces no llegará a responder true. Se cae antes.
-    res.json(true);
+    res.json({message: "Success", isValid: true});
+    
   } catch (err) {
     console.error(err.message);
     return res.status(500).json("Server error");

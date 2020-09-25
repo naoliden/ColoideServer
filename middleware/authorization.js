@@ -7,7 +7,7 @@ module.exports = async (req, res, next) => {
     const jwToken = req.header("token");
 
     if (!jwToken){
-      return res.status(403).json("Not Authorized")
+      return res.status(403).json({message: "Not Authorized", isValid: false})
     }
 
     // 2. if verified it will return a payload.
@@ -15,12 +15,12 @@ module.exports = async (req, res, next) => {
     // del token. jwt.verify retorna el id desencriptado dentro del payload (igual como se creó)
     const payload = jwt.verify(jwToken, process.env.jwtSecret);
     req.user_id = payload.user_id;
-
+    
     // 3. continue to the next route with the verification info.
     next();
 
   } catch (err) {
     console.error(err.message);
-    return res.status(403).json("Not Authorized")
+    return res.status(403).json({message: "Not Authorized", isValid: false})
   }
 }
