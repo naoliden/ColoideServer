@@ -1,9 +1,9 @@
 module.exports = (req, res, next) => {
 
-  const { name } = req.body;
+  const { client_name } = req.body;
 
   if (req.path === "/register") {
-    if (![name].every(Boolean)) 
+    if (![client_name].every(Boolean)) 
     {
       return res.status(400).json("Missing Credentials");
     } 

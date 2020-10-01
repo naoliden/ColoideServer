@@ -128,5 +128,17 @@ router.delete("/delete", authorization, async (req, res) => {
   }
 });
 
+router.get("/byclient", async (req, res) => {
+  try {
+    const query = await pool.query(
+      "SELECT * from users INNER JOIN clients ON users.client_id = clients.client_id" 
+     + " ORDER BY LOWER(client_name), LOWER(firstname);"
+     );
+    return res.json(query.rows);
+  } catch (error) {
+    console.error(error);
+  }
+})
+
 
 module.exports = router;
