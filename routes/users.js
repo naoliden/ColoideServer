@@ -2,11 +2,13 @@ const router = require('express').Router();
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 const jwtGenerator = require('../functions/jwtGenerator');
+const groupby = require('../functions/groupby');
 const userValidations = require('../middleware/userValidations');
 const authorization = require('../middleware/authorization');
 
+
 // DONE GET USERS
-router.get("/", async (req, res) => {
+router.get("/by_id", async (req, res) => {
   try {
     if(req.query.client_id){
       if(req.query.client_id === 'null'){
@@ -38,7 +40,6 @@ router.post("/register", authorization, userValidations, async (req, res) => {
   try {
     // step 1. destructure the request.body (name, email, password)
     const { firstname, lastname, email, password, client_id, user_type  } = req.body;
-
     // step 2. Check if user exists. (if not throw error)
     const user = await pool.query("SELECT * FROM users WHERE email = $1;", [
       email
@@ -113,14 +114,14 @@ router.delete("/delete", authorization, async (req, res) => {
   try {
     // 1. destructure req.body
     const { user_id } = req.body;
-    
+    console.log(user_id);
     // 2. delete client
     const user = await pool.query("DELETE FROM users WHERE user_id = $1;", [
       user_id
     ]);
 
     // 3. return something
-    return res.json({ commmand: client.command, deleted: (client.rowCount == true), user_id });
+    return res.json({ commmand: user.command, deleted: (user.rowCount == true), user_id });
 
   } catch (err) {
     console.error(err.message);
@@ -128,16 +129,20 @@ router.delete("/delete", authorization, async (req, res) => {
   }
 });
 
-router.get("/byclient", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const query = await pool.query(
-      "SELECT * from users INNER JOIN clients ON users.client_id = clients.client_id" 
+      "SELECT * from users LEFT JOIN clients ON users.client_id = clients.client_id" 
      + " ORDER BY LOWER(client_name), LOWER(firstname);"
      );
-    return res.json(query.rows);
+
+    const grouped = groupby(query.rows, "client_name");
+    return res.json(grouped);
+
   } catch (error) {
     console.error(error);
   }
+
 })
 
 
