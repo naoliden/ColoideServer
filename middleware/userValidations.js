@@ -15,7 +15,6 @@ module.exports = (req, res, next) => {
   }
 
   if (req.path === "/register") {
-    console.log(!email.length);
     if (![email, firstname, password, user_type].every(Boolean)) 
     {
       return res.status(400).json("Missing Credentials");

@@ -39,7 +39,7 @@ CREATE TABLE clients(
 
 CREATE TABLE tasks (
   task_id SERIAL PRIMARY KEY DEFAULT,
-  name VARCHAR(255) NOT NULL,
+  task_name VARCHAR(255) NOT NULL,
   task VARCHAR(255) NOT NULL,
   units VARCHAR(255) NOT NULL,
   instructions VARCHAR(255),

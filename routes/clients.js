@@ -6,7 +6,7 @@ const authorization = require('../middleware/authorization');
 
 router.get("/", async (req, res) => {
   try {
-    const clients = await pool.query("SELECT * FROM clients;");
+    const clients = await pool.query("SELECT * FROM clients WHERE client_name != 'Independiente';");
     if (clients.rows.length > 0){
       return res.json(clients.rows);
     }
@@ -53,7 +53,7 @@ router.post("/register", clientValidations, async (req, res) => {
 router.delete("/delete", authorization, async (req, res) => {
   try {
     // 1. destructure req.body
-    const { client_id, new_name } = req.body;
+    const { client_id } = req.body;
     
     // 2. delete client
     const client = await pool.query("DELETE FROM clients WHERE client_id = $1;", [
@@ -61,7 +61,7 @@ router.delete("/delete", authorization, async (req, res) => {
     ]);
 
     // 3. return something
-    return res.json({ commmand: client.command, deleted: (client.rowCount == true), new_name });
+    return res.json({ commmand: client.command, deleted: (client.rowCount == true) });
 
   } catch (err) {
     console.error(err.message);
