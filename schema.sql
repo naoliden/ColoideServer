@@ -1,9 +1,9 @@
-CREATE TABLE "clients" (
+CREATE TABLE IF NOT EXISTS "clients" (
   "client_id" SERIAL PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL DEFAULT 'Independiente'
 );
 
-CREATE TABLE "users" (
+CREATE TABLE IF NOT EXISTS "users" (
   "user_id" SERIAL PRIMARY KEY,
   "client_id" integer NOT NULL,
   "firstname" varchar NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE "users" (
   "user_type" varchar NOT NULL
 );
 
-CREATE TABLE "ensayos" (
+CREATE TABLE IF NOT EXISTS "ensayos" (
   "ensayo_id" SERIAL PRIMARY KEY,
   "variety_id" integer NOT NULL,
   "mediciones" integer NOT NULL,
@@ -25,85 +25,85 @@ CREATE TABLE "ensayos" (
   "unidades_por_ue" integer DEFAULT 1,
   "replicas" integer NOT NULL,
   "tratamientos" integer NOT NULL,
-  "comentario" varchar NOT NULL DEFAULT '',
+  "comentario" text NOT NULL DEFAULT '',
   "status" varchar NOT NULL DEFAULT 'en proceso'
 );
 
-CREATE TABLE "fechasMediciones" (
+CREATE TABLE IF NOT EXISTS "fechas_mediciones" (
   "fecha_id" SERIAL,
   "ensayo_id" integer,
-  "fecha" datetime NOT NULL,
+  "fecha" timestamp NOT NULL DEFAULT (now()),
   "tipo" varchar NOT NULL DEFAULT 'medicion inicial',
   PRIMARY KEY ("fecha_id", "ensayo_id")
 );
 
-CREATE TABLE "tratamientos" (
+CREATE TABLE IF NOT EXISTS "tratamientos" (
   "tratamiento_id" SERIAL PRIMARY KEY,
   "fecha_id" integer NOT NULL,
   "nombre_tratamiento" varchar NOT NULL
 );
 
-CREATE TABLE "medicionValor" (
+CREATE TABLE IF NOT EXISTS "medicion_valor" (
   "value_id" SERIAL PRIMARY KEY,
   "tratamiento_id" integer NOT NULL,
-  "value" integer NOT NULL DEFAULT 0,
+  "value" float NOT NULL DEFAULT 0,
   "task_id" integer NOT NULL
 );
 
-CREATE TABLE "tasks" (
+CREATE TABLE IF NOT EXISTS "tasks" (
   "task_id" SERIAL PRIMARY KEY,
   "task_name" varchar UNIQUE NOT NULL,
   "instrucciones" varchar DEFAULT '',
   "unidades" varchar DEFAULT ''
 );
 
-CREATE TABLE "fruits" (
+CREATE TABLE IF NOT EXISTS "fruits" (
   "fruit_id" SERIAL PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL
 );
 
-CREATE TABLE "fruitVariety" (
+CREATE TABLE IF NOT EXISTS "fruit_variety" (
   "variety_id" SERIAL PRIMARY KEY,
   "fruit_id" integer NOT NULL,
   "variety" varchar UNIQUE NOT NULL
 );
 
-CREATE TABLE "usersTests" (
+CREATE TABLE IF NOT EXISTS "users_tests" (
   "user_id" integer,
   "test_id" integer,
   PRIMARY KEY ("user_id", "test_id")
 );
 
-CREATE TABLE "fruitsTasks" (
+CREATE TABLE IF NOT EXISTS "fruits_tasks" (
   "fruit_id" integer,
   "task_id" integer,
   PRIMARY KEY ("fruit_id", "task_id")
 );
 
-ALTER TABLE "fechasMediciones" ADD FOREIGN KEY ("ensayo_id") REFERENCES "ensayos" ("ensayo_id");
-
-ALTER TABLE "tratamientos" ADD FOREIGN KEY ("fecha_id") REFERENCES "fechasMediciones" ("fecha_id");
-
-ALTER TABLE "medicionValor" ADD FOREIGN KEY ("tratamiento_id") REFERENCES "tratamientos" ("tratamiento_id");
-
-ALTER TABLE "medicionValor" ADD FOREIGN KEY ("task_id") REFERENCES "tasks" ("task_id");
-
-ALTER TABLE "fruitsTasks" ADD FOREIGN KEY ("fruit_id") REFERENCES "fruits" ("fruit_id");
-
-ALTER TABLE "fruitsTasks" ADD FOREIGN KEY ("task_id") REFERENCES "tasks" ("task_id");
-
-ALTER TABLE "ensayos" ADD FOREIGN KEY ("variety_id") REFERENCES "fruitVariety" ("variety_id");
-
 ALTER TABLE "users" ADD FOREIGN KEY ("client_id") REFERENCES "clients" ("client_id");
 
-ALTER TABLE "usersTests" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+ALTER TABLE "fechas_mediciones" ADD FOREIGN KEY ("ensayo_id") REFERENCES "ensayos" ("ensayo_id");
 
-ALTER TABLE "usersTests" ADD FOREIGN KEY ("test_id") REFERENCES "ensayos" ("ensayo_id");
+ALTER TABLE "tratamientos" ADD FOREIGN KEY ("fecha_id", "tratamiento_id") REFERENCES "fechas_mediciones" ("fecha_id", "ensayo_id");
 
-ALTER TABLE "fruitVariety" ADD FOREIGN KEY ("fruit_id") REFERENCES "fruits" ("fruit_id");
+ALTER TABLE "medicion_valor" ADD FOREIGN KEY ("tratamiento_id") REFERENCES "tratamientos" ("tratamiento_id");
+
+ALTER TABLE "medicion_valor" ADD FOREIGN KEY ("task_id") REFERENCES "tasks" ("task_id");
+
+ALTER TABLE "ensayos" ADD FOREIGN KEY ("variety_id") REFERENCES "fruit_variety" ("variety_id");
+
+ALTER TABLE "fruit_variety" ADD FOREIGN KEY ("fruit_id") REFERENCES "fruits" ("fruit_id");
+
+ALTER TABLE "users_tests" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
+
+ALTER TABLE "users_tests" ADD FOREIGN KEY ("test_id") REFERENCES "ensayos" ("ensayo_id");
+
+ALTER TABLE "fruits_tasks" ADD FOREIGN KEY ("fruit_id") REFERENCES "fruits" ("fruit_id");
+
+ALTER TABLE "fruits_tasks" ADD FOREIGN KEY ("task_id") REFERENCES "tasks" ("task_id");
 
 
-COMMENT ON COLUMN "clients"."name" IS 'Nombre de la empresa cliente';
+COMMENT ON COLUMN "clients"."client_name" IS 'Nombre de la empresa cliente';
 
 COMMENT ON COLUMN "users"."user_type" IS 'admin, client, collector';
 
@@ -125,19 +125,19 @@ COMMENT ON COLUMN "ensayos"."comentario" IS 'Comentarios sobre la i-esima medici
 
 COMMENT ON COLUMN "ensayos"."status" IS 'en proceso, terminado, incompleto';
 
-COMMENT ON COLUMN "fechasMediciones"."ensayo_id" IS 'a que test pertenece';
+COMMENT ON COLUMN "fechas_mediciones"."ensayo_id" IS 'a que test pertenece';
 
-COMMENT ON COLUMN "fechasMediciones"."fecha" IS 'fecha de la medicion';
+COMMENT ON COLUMN "fechas_mediciones"."fecha" IS 'fecha de la medicion';
 
-COMMENT ON COLUMN "fechasMediciones"."tipo" IS 'medicion inicial, en frio o ambiente';
+COMMENT ON COLUMN "fechas_mediciones"."tipo" IS 'medicion inicial, en frio o ambiente';
 
-COMMENT ON COLUMN "tratamientos"."fecha_id" IS 'id de la fech de medicion';
+COMMENT ON COLUMN "tratamientos"."fecha_id" IS 'id de la fecha de medicion';
 
 COMMENT ON COLUMN "tratamientos"."nombre_tratamiento" IS 'nombre de la replica T0, T1, etc';
 
-COMMENT ON COLUMN "medicionValor"."value" IS 'valor de la medicion, frente a presencia o no presencia, 1 o 0';
+COMMENT ON COLUMN "medicion_valor"."value" IS 'valor de la medicion, frente a presencia o no presencia, 1 o 0';
 
-COMMENT ON COLUMN "medicionValor"."task_id" IS 'id del tipo de medicion';
+COMMENT ON COLUMN "medicion_valor"."task_id" IS 'id del tipo de medicion';
 
 COMMENT ON COLUMN "tasks"."task_name" IS 'nombre de la medicion. eg: peso, #podridos';
 
@@ -145,6 +145,6 @@ COMMENT ON COLUMN "tasks"."instrucciones" IS 'instrucciones de como realizar la 
 
 COMMENT ON COLUMN "tasks"."unidades" IS 'unidades de la medicion';
 
-COMMENT ON COLUMN "fruitVariety"."fruit_id" IS 'Id del tipo de fruta al que pertenece esta variedad';
+COMMENT ON COLUMN "fruit_variety"."fruit_id" IS 'Id del tipo de fruta al que pertenece esta variedad';
 
-COMMENT ON COLUMN "fruitVariety"."variety" IS 'Variedad de fruta, eg: Pink Lady';
+COMMENT ON COLUMN "fruit_variety"."variety" IS 'Variedad de fruta, eg: Pink Lady';

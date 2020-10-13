@@ -5,6 +5,8 @@ const jwtGenerator = require("../functions/jwtGenerator");
 const groupby = require("../functions/groupby");
 const userValidations = require("../middleware/userValidations");
 const authorization = require("../middleware/authorization");
+const setValueLabel = require("../functions/setValueLabel")
+
 
 // DONE GET USERS
 router.get("/by_id", async (req, res) => {
@@ -15,7 +17,17 @@ router.get("/by_id", async (req, res) => {
         "SELECT * FROM users WHERE client_id = $1;",
         [req.query.client_id]
       );
-      return res.json(users.rows);
+        
+        if(req.query.select) 
+        {
+          const labels = setValueLabel(users.rows);
+          return res.json(labels);
+        } 
+        else 
+        {
+          return res.json(users.rows);;
+        }
+
     } else if (req.query.user_id) {
       // query by user_id => returns a single unique user
       const user = await pool.query("SELECT * FROM users WHERE user_id = $1;", [
